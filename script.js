@@ -72,7 +72,7 @@ async function loadData() {
         }
     });
 
-    Object.values(data).forEach(item => {
+    Object.values(data).sort((a, b) => (b.squats + b.pushups + b.lunges) - (a.squats + a.pushups + a.lunges)).forEach(item => {
         tableRows += `<tr>
                         <td>${item.name}</td>
                         <td>${item.squats}</td>
