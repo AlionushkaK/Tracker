@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exercise Tracker</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <h1>Exercise Tracker</h1>
     <img src="Logo.png" alt="Knight Logo" class="exercise-logo"> <!-- Замените path_to_your_image на путь к вашему логотипу -->
@@ -40,8 +42,35 @@
         <tbody>
         </tbody>
     </table>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyD7TpKxeTrn4gNtMbxm5CBYvm6ONihJrmQ",
+            authDomain: "tracker-ac145.firebaseapp.com",
+            projectId: "tracker-ac145",
+            storageBucket: "tracker-ac145.appspot.com",
+            messagingSenderId: "493504976907",
+            appId: "1:493504976907:web:ba6b17adf84d40421fcf0e",
+            measurementId: "G-YE9D0M156W"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        window.db = getFirestore(app);
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+    </script>
     <script src="script.js"></script>
 </body>
+
 </html>
-
-
