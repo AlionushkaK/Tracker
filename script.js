@@ -19,6 +19,7 @@ document.getElementById('exerciseForm').addEventListener('submit', async functio
     const squats = parseInt(squatsInput.value, 10) || 0;
     const pushups = parseInt(pushupsInput.value, 10) || 0;
     const lunges = parseInt(lungesInput.value, 10) || 0;
+   
 
 
     try {
@@ -51,20 +52,40 @@ function formatDate(date) {
 }
 
 async function loadData() {
-
     const querySnapshot = await getDocs(collection(db, "exercises"));
-    const tableRows = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        return `<tr>
-                    <td>${data.name}</td>
-                    <td>${data.squats}</td>
-                    <td>${data.pushups}</td>
-                    <td>${data.lunges}</td>
-                    <td>${formatDate(new Date(data.date.toDate()))}</td>
-                </tr>`;
-    }).join('');
-    document.getElementById('dailyStats').getElementsByTagName('tbody')[0].innerHTML = tableRows;
+    let tableRows = "";
+
+    console.log("Documents retrieved:", querySnapshot.docs.length);
+    const data = {};
+    querySnapshot.forEach(doc => {
+        const { name, squats, pushups, lunges, date } = doc.data();
+        const parsedDate = new Date(date.toDate());
+        const groupDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDay());
+        const key = `${name}-${groupDate}`;
+        
+        if (!data[key]) {
+            data[key] = { name, squats, pushups, lunges, groupDate };
+        } else {
+            data[key].squats += squats;
+            data[key].pushups += pushups;
+            data[key].lunges += lunges;
+        }
+    });
+
+    Object.values(data).forEach(item => {
+        tableRows += `<tr>
+                        <td>${item.name}</td>
+                        <td>${item.squats}</td>
+                        <td>${item.pushups}</td>
+                        <td>${item.lunges}</td>
+                        <td>${formatDate(item.groupDate)}</td>
+                      </tr>`;
+    });
+
+    const table = document.getElementById('dailyStats').getElementsByTagName('tbody')[0];
+    table.innerHTML = tableRows;
 }
+
 
 
 
