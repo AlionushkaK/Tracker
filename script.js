@@ -52,17 +52,19 @@ function formatDate(date) {
 }
 
 async function loadData() {
+    const filterName = document.getElementById('filterName').value.toLowerCase().trim();
+    const filterDate = document.getElementById('filterDate').value; // Формат yyyy-mm-dd
+
     const querySnapshot = await getDocs(collection(db, "exercises"));
     let tableRows = "";
 
-    console.log("Documents retrieved:", querySnapshot.docs.length);
     const data = {};
     querySnapshot.forEach(doc => {
         const { name, squats, pushups, lunges, date } = doc.data();
         const parsedDate = new Date(date.toDate());
         const groupDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
 
-        const key = `${groupDate.toISOString()}-${name}`; // Изменение формата ключа
+        const key = `${groupDate.toISOString()}-${name}`;
         
         if (!data[key]) {
             data[key] = { name, squats, pushups, lunges, groupDate, totalExercises: squats + pushups + lunges };
@@ -74,8 +76,15 @@ async function loadData() {
         }
     });
 
-    // Сначала сортировка по дате, затем по общему количеству упражнений
-    Object.values(data).sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises).forEach(item => {
+    // Применение фильтров
+    const filteredData = Object.values(data).filter(item => {
+        const itemDate = formatDate(item.groupDate);
+        return (!filterName || item.name.toLowerCase().includes(filterName)) && // Используем includes вместо startsWith
+               (!filterDate || itemDate === filterDate);
+    });
+
+    // Сортировка
+    filteredData.sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises).forEach(item => {
         tableRows += `<tr>
                         <td>${item.name}</td>
                         <td>${item.squats}</td>
@@ -88,7 +97,3 @@ async function loadData() {
     const table = document.getElementById('dailyStats').getElementsByTagName('tbody')[0];
     table.innerHTML = tableRows;
 }
-
-
-
-
