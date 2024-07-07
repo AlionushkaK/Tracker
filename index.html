@@ -11,26 +11,32 @@
 <body>
     <h1>Челлендж 1.0</h1>
     <img src="Logo.png" alt="Knight Logo" class="exercise-logo">
+    <div style="display: flex; justify-content: space-between;">
+        <form id="exerciseForm">
+            <label for="name">Имя:</label>
+            <input type="text" id="name" placeholder="Введите имя" required>
+            <br><br>
 
-    <form id="exerciseForm">
-        <label for="name">Имя:</label>
-        <input type="text" id="name" placeholder="Введите имя" required>
-        <br><br>
+            <label for="squats">Приседания:</label>
+            <input type="number" id="squats" placeholder="Введите количество приседаний" required>
+            <br><br>
 
-        <label for="squats">Приседания:</label>
-        <input type="number" id="squats" placeholder="Введите количество приседаний" required>
-        <br><br>
+            <label for="pushups">Отжимания:</label>
+            <input type="number" id="pushups" placeholder="Введите количество отжиманий" required>
+            <br><br>
 
-        <label for="pushups">Отжимания:</label>
-        <input type="number" id="pushups" placeholder="Введите количество отжиманий" required>
-        <br><br>
+            <label for="lunges">Выпады:</label>
+            <input type="number" id="lunges" placeholder="Введите количество выпадов" required>
+            <br><br>
 
-        <label for="lunges">Выпады:</label>
-        <input type="number" id="lunges" placeholder="Введите количество выпадов" required>
-        <br><br>
+            <button type="submit">Отправить результаты чемпиона</button>
+        </form>
+        <div style="flex: 1;"> <!-- Контейнер для графика -->
+            <canvas id="leaderChart" width="400" height="400"></canvas>
+        </div>
+    </div>
 
-        <button type="submit">Отправить результаты чемпиона</button>
-    </form>
+
     <img src="Horse.png" alt="Run Wawa Run Logo" class="exercise-logo">
     <div id="result">
     </div>
@@ -42,8 +48,7 @@
 
     <div style="padding-bottom: 20px;">
         <label for="filterDate" style="margin-right: 10px;">Фильтр по дате:</label>
-        <input type="date" id="filterDate" onchange="loadData()" 
-            style="width: 200px; height: 35px;">
+        <input type="date" id="filterDate" onchange="loadData()" style="width: 200px; height: 35px;">
     </div>
     <h2>Статистика:</h2>
     <table id="dailyStats">
@@ -88,6 +93,11 @@
         window.getDocs = getDocs;
     </script>
     <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.0"></script>
+
+
 </body>
 
 </html>

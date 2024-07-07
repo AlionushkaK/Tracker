@@ -96,4 +96,69 @@ async function loadData() {
 
     const table = document.getElementById('dailyStats').getElementsByTagName('tbody')[0];
     table.innerHTML = tableRows;
+    await drawChart();
+}
+async function drawChart() {
+    const ctx = document.getElementById('leaderChart').getContext('2d');
+    if (!ctx) {
+        console.error('Canvas element not found!');
+        return;
+    }
+
+    const querySnapshot = await getDocs(collection(db, "exercises"));
+    let dataByDate = {};
+
+    querySnapshot.forEach(doc => {
+        const { name, squats, pushups, lunges, date } = doc.data();
+        const parsedDate = new Date(date.toDate());
+        const formattedDate = formatDate(parsedDate);
+
+        if (!dataByDate[formattedDate]) {
+            dataByDate[formattedDate] = {};
+        }
+        dataByDate[formattedDate][name] = (dataByDate[formattedDate][name] || 0) + squats + pushups + lunges;
+    });
+
+    const dates = Object.keys(dataByDate).sort();
+    const participants = new Set();
+
+    dates.forEach(date => {
+        Object.keys(dataByDate[date]).forEach(name => participants.add(name));
+    });
+
+    const datasets = Array.from(participants).map(participant => ({
+        label: participant,
+        data: dates.map(date => dataByDate[date][participant] || 0),
+        backgroundColor: getRandomColor(),
+        borderWidth: 1
+    }));
+
+    // Создание столбчатого графика
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dates,
+            datasets: datasets
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                },
+                x: {
+                    // Эта опция гарантирует, что столбцы будут группироваться, а не наслаиваться
+                    stacked: false
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function getRandomColor() {
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+    return `rgb(${r}, ${g}, ${b})`;
 }

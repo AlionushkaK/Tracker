@@ -78,6 +78,10 @@ th, td {
     font-size: 1.2em; /* Размер звездочки */
     margin-right: 5px; /* Отступ от текста */
 }
+/* Стилизация шрифта в ячейке для увеличения влияния иконки */
+#dailyStats tbody tr:first-child td:first-child {
+    font-weight: bold; /* Делаем текст жирным */
+}
 
 @media (max-width: 768px) {
     table {
