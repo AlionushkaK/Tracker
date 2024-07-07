@@ -92,6 +92,46 @@ img {
 #dailyStats tbody tr:first-child td:first-child {
     font-weight: bold; /* Делаем текст жирным */
 }
+/* Базовые стили для всех устройств */
+.exercise-logo {
+    max-width: 100%;
+    height: auto;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed; /* Задает равное распределение ширины колонок */
+}
+th, td {
+    word-wrap: break-word; /* Позволяет словам переноситься, если они не умещаются целиком */
+    white-space: normal; /* Обеспечивает нормальное отображение пробелов и переносов */
+    padding: 5px; /* Добавляет небольшой отступ вокруг текста внутри ячеек */
+    font-size: 11px; /* Уменьшает размер шрифта для улучшения читаемости на маленьких экранах */
+}
+
+input, button {
+    width: 100%; /* Заполняет доступную ширину */
+    box-sizing: border-box; /* Включает padding и border в ширину элемента */
+    margin-bottom: 10px; /* Добавляет отступ снизу для каждого элемента формы */
+}
+
+/* Медиазапросы */
+@media (max-width: 768px) {
+    #filterName, #filterDate {
+        width: 100%; /* Уменьшает ширину полей ввода */
+    }
+
+    .exercise-logo {
+        display: block; /* Центрирует логотипы */
+        margin: 0 auto 20px; /* Добавляет отступ снизу */
+    }
+}
+
+@media (max-width: 480px) {
+    h1, h2 {
+        font-size: 1.5em; /* Уменьшает размер шрифта заголовков */
+    }
+}
 
 
 
