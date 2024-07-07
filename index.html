@@ -14,30 +14,34 @@
     <!-- Замените path_to_your_image на путь к вашему логотипу -->
     <form id="exerciseForm">
         <label for="name">Имя:</label>
-        <input type="text" id="name" placeholder="Введите имя" required><br><br>
+        <input type="text" id="name" placeholder="Введите имя" required>
+        <br><br>
 
         <label for="squats">Приседания:</label>
-        <input type="number" id="squats" placeholder="Введите количество приседаний" required><br><br>
+        <input type="number" id="squats" placeholder="Введите количество приседаний" required>
+        <br><br>
 
         <label for="pushups">Отжимания:</label>
-        <input type="number" id="pushups" placeholder="Введите количество отжиманий" required><br><br>
+        <input type="number" id="pushups" placeholder="Введите количество отжиманий" required>
+        <br><br>
 
         <label for="lunges">Выпады:</label>
-        <input type="number" id="lunges" placeholder="Введите количество выпадов" required><br><br>
+        <input type="number" id="lunges" placeholder="Введите количество выпадов" required>
+        <br><br>
 
         <button type="submit">Отправить результаты чемпиона</button>
     </form>
     <img src="Horse.png" alt="Run Wawa Run Logo" class="exercise-logo">
     <!-- Замените path_to_your_image на путь к вашему логотипу -->
     <div id="result"></div>
+    <div style="padding-bottom: 20px;">
+        <label for="filterName" style="margin-right: 10px;">Фильтр по имени:</label>
+        <input type="text" id="filterName" placeholder="Введите имя" oninput="loadData()" style="width: 350px; height: 35px; margin-right: 20px;">
+        <label for="filterDate" style="margin-right: 10px;">Фильтр по дате:</label>
+        <input type="date" id="filterDate" onchange="loadData()" style="width: 250px; height: 35px;">
+    </div>
     <h2>Статистика:</h2>
     <table id="dailyStats">
-        <div style="padding-bottom: 20px;">
-            <label for="filterName" style="margin-right: 10px;">Фильтр по имени:</label>
-            <input type="text" id="filterName" placeholder="Введите имя" oninput="loadData()" style="width: 350px; height: 35px; margin-right: 20px;">
-            <label for="filterDate" style="margin-right: 10px;">Фильтр по дате:</label>
-            <input type="date" id="filterDate" onchange="loadData()" style="width: 250px; height: 35px;">
-        </div>
         <thead>
             <tr>
                 <th>Имя</th>
