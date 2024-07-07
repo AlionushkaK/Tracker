@@ -37,9 +37,13 @@
     <div style="padding-bottom: 20px;">
         <label for="filterName" style="margin-right: 10px;">Фильтр по имени:</label>
         <input type="text" id="filterName" placeholder="Введите имя" oninput="loadData()"
-            style="width: 350px; height: 35px; margin-right: 20px;">
+            style="width: 250px; height: 35px; margin-right: 20px;">
+    </div>
+
+    <div style="padding-bottom: 20px;">
         <label for="filterDate" style="margin-right: 10px;">Фильтр по дате:</label>
-        <input type="date" id="filterDate" onchange="loadData()" style="width: 250px; height: 35px;">
+        <input type="date" id="filterDate" onchange="loadData()" 
+            style="width: 200px; height: 35px;">
     </div>
     <h2>Статистика:</h2>
     <table id="dailyStats">
