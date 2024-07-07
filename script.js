@@ -60,7 +60,9 @@ async function loadData() {
     querySnapshot.forEach(doc => {
         const { name, squats, pushups, lunges, date } = doc.data();
         const parsedDate = new Date(date.toDate());
-        const groupDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDay());
+        // const groupDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDay());
+        const groupDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
+
         const key = `${name}-${groupDate}`;
         
         if (!data[key]) {
