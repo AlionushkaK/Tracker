@@ -48,8 +48,9 @@ function formatDate(date) {
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    return `${year}-${month}-${day}`; // Изменение порядка для соответствия формату HTML input[type="date"]
 }
+
 
 async function loadData() {
     const filterName = document.getElementById('filterName').value.toLowerCase().trim();
@@ -61,11 +62,10 @@ async function loadData() {
     const data = {};
     querySnapshot.forEach(doc => {
         const { name, squats, pushups, lunges, date } = doc.data();
-        const parsedDate = new Date(date.toDate());
+        const parsedDate = new Date(date.toDate()); // Преобразование Firestore Timestamp в Date
         const groupDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
 
         const key = `${groupDate.toISOString()}-${name}`;
-        
         if (!data[key]) {
             data[key] = { name, squats, pushups, lunges, groupDate, totalExercises: squats + pushups + lunges };
         } else {
@@ -76,14 +76,14 @@ async function loadData() {
         }
     });
 
-    // Применение фильтров
+    // Фильтрация и сортировка данных
     const filteredData = Object.values(data).filter(item => {
         const itemDate = formatDate(item.groupDate);
-        return (!filterName || item.name.toLowerCase().includes(filterName)) && // Используем includes вместо startsWith
+        return (!filterName || item.name.toLowerCase().includes(filterName)) &&
                (!filterDate || itemDate === filterDate);
     });
 
-    // Сортировка
+    // Сортировка и отображение данных
     filteredData.sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises).forEach(item => {
         tableRows += `<tr>
                         <td>${item.name}</td>
