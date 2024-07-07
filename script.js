@@ -60,21 +60,22 @@ async function loadData() {
     querySnapshot.forEach(doc => {
         const { name, squats, pushups, lunges, date } = doc.data();
         const parsedDate = new Date(date.toDate());
-        // const groupDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDay());
         const groupDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
 
-        const key = `${name}-${groupDate}`;
+        const key = `${groupDate.toISOString()}-${name}`; // Изменение формата ключа
         
         if (!data[key]) {
-            data[key] = { name, squats, pushups, lunges, groupDate };
+            data[key] = { name, squats, pushups, lunges, groupDate, totalExercises: squats + pushups + lunges };
         } else {
             data[key].squats += squats;
             data[key].pushups += pushups;
             data[key].lunges += lunges;
+            data[key].totalExercises += (squats + pushups + lunges);
         }
     });
 
-    Object.values(data).sort((a, b) => (b.squats + b.pushups + b.lunges) - (a.squats + a.pushups + a.lunges)).forEach(item => {
+    // Сначала сортировка по дате, затем по общему количеству упражнений
+    Object.values(data).sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises).forEach(item => {
         tableRows += `<tr>
                         <td>${item.name}</td>
                         <td>${item.squats}</td>
