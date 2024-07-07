@@ -11,7 +11,7 @@
 <body>
     <h1>Челлендж 1.0</h1>
     <img src="Logo.png" alt="Knight Logo" class="exercise-logo">
-    <!-- Замените path_to_your_image на путь к вашему логотипу -->
+
     <form id="exerciseForm">
         <label for="name">Имя:</label>
         <input type="text" id="name" placeholder="Введите имя" required>
@@ -32,11 +32,12 @@
         <button type="submit">Отправить результаты чемпиона</button>
     </form>
     <img src="Horse.png" alt="Run Wawa Run Logo" class="exercise-logo">
-    <!-- Замените path_to_your_image на путь к вашему логотипу -->
-    <div id="result"></div>
+    <div id="result">
+    </div>
     <div style="padding-bottom: 20px;">
         <label for="filterName" style="margin-right: 10px;">Фильтр по имени:</label>
-        <input type="text" id="filterName" placeholder="Введите имя" oninput="loadData()" style="width: 350px; height: 35px; margin-right: 20px;">
+        <input type="text" id="filterName" placeholder="Введите имя" oninput="loadData()"
+            style="width: 350px; height: 35px; margin-right: 20px;">
         <label for="filterDate" style="margin-right: 10px;">Фильтр по дате:</label>
         <input type="date" id="filterDate" onchange="loadData()" style="width: 250px; height: 35px;">
     </div>
