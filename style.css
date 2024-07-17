@@ -9,6 +9,7 @@ body {
     margin-bottom: 10px; /* Добавляет небольшой отступ снизу */
     margin-left: 0; /* Устанавливает отступ слева, чтобы прижать к левому краю */
 }
+
 body::before {
     content: "";
     position: absolute;
@@ -52,7 +53,10 @@ button:hover {
 input, button {
     margin-bottom: 10px; /* Установите меньший отступ снизу, если нужно */
 }
-
+.table-container {
+    max-height: 400px; /* Ограничение высоты контейнера таблицы */
+    overflow-y: auto; /* Вертикальная прокрутка при переполнении */
+} 
 table {
     width: 50%; /* Устанавливаем ширину таблицы на 100% от доступного пространства */
     table-layout: auto; /* Переключаемся с fixed на auto для автоматической адаптации ширины колонок */
@@ -84,12 +88,29 @@ th, td {
 }
 
 @media (max-width: 768px) {
+    form {
+        width: 100%; /* Элементы формы занимают всю ширину на мобильных устройствах */
+    }
+    
+    .form-container {
+        flex-direction: column; /* Строки формы располагаются по вертикали */
+    }
+
+    input[type="text"], input[type="number"], button {
+        width: 100%; /* Элементы формы занимают всю ширину на мобильных устройствах */
+    }
+
+    .chart-container {
+        width: 100%;
+    }
+
     table {
         width: 100%; /* Увеличиваем ширину таблицы до 100% на малых экранах */
     }
 
-    form, input[type="text"], input[type="number"], button {
-        width: 100%; /* Элементы формы занимают всю ширину на мобильных устройствах */
+    .pagination {
+        width: 100%; /* Увеличиваем ширину контейнера пагинации */
+        align-items: center; /* Центрируем элементы по горизонтали */
     }
 }
 
@@ -101,4 +122,43 @@ th, td {
     table, th, td {
         font-size: 10px; /* Уменьшение шрифта в таблице для лучшей читаемости */
     }
+}
+
+.pagination {
+    width: 25%;
+    display: flex;
+    flex-direction: column; /* Располагает элементы по вертикали */
+    align-items: left;
+}
+
+.pagination button, .btn {
+    padding: 5px 20px;
+    margin: 4px 0;
+    font-size: 14px;
+    background-color: #b149e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.pagination button:hover, .btn:hover {
+    background-color: #b149e5;
+}
+
+.pagination-btn {
+    background-color: #a61ce1; 
+}
+
+.pagination-btn:hover {
+    background-color: #a61ce1; 
+}
+
+.pagination span {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+#prevPage, #nextPage {
+    margin-right: 0;
 }

@@ -1,5 +1,10 @@
+let currentPage = 1;
+let rowsPerPage = 15;
+let totalRows = 0;
+
 document.addEventListener('DOMContentLoaded', function () {
     loadData();
+    populateNameList();
 });
 
 document.getElementById('exerciseForm').addEventListener('submit', async function (event) {
@@ -12,27 +17,23 @@ document.getElementById('exerciseForm').addEventListener('submit', async functio
 
     const name = nameInput.value.trim();
     if (name === '') {
-        alert('Пожалуйста, введите имя.');
+        alert('Please enter a name.');
         return;
     }
 
     const squats = parseInt(squatsInput.value, 10) || 0;
     const pushups = parseInt(pushupsInput.value, 10) || 0;
     const lunges = parseInt(lungesInput.value, 10) || 0;
-   
-
 
     try {
-        // Добавляем данные в коллекцию Firestore
         await addDoc(collection(window.db, "exercises"), {
             name: name,
-            squats: parseInt(squats),
-            pushups: parseInt(pushups),
-            lunges: parseInt(lunges),
-            date: new Date() // Записываем текущую дату и время
+            squats: squats,
+            pushups: pushups,
+            lunges: lunges,
+            date: new Date()
         });
         console.log("Data added successfully.");
-        // Очистка формы или другие действия после отправки
     } catch (error) {
         console.error("Error adding document: ", error);
     }
@@ -41,20 +42,21 @@ document.getElementById('exerciseForm').addEventListener('submit', async functio
     squatsInput.value = '';
     pushupsInput.value = '';
     lungesInput.value = '';
-    await loadData()
+    await loadData();
+    await populateNameList();
 });
 
 function formatDate(date) {
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
-    return `${year}-${month}-${day}`; // Изменение порядка для соответствия формату HTML input[type="date"]
+    return `${year}-${month}-${day}`;
 }
 
-
 async function loadData() {
+    rowsPerPage = parseInt(document.getElementById('rowsPerPage').value);
     const filterName = document.getElementById('filterName').value.toLowerCase().trim();
-    const filterDate = document.getElementById('filterDate').value; // Формат yyyy-mm-dd
+    const filterDate = document.getElementById('filterDate').value;
 
     const querySnapshot = await getDocs(collection(db, "exercises"));
     let tableRows = "";
@@ -62,7 +64,7 @@ async function loadData() {
     const data = {};
     querySnapshot.forEach(doc => {
         const { name, squats, pushups, lunges, date } = doc.data();
-        const parsedDate = new Date(date.toDate()); // Преобразование Firestore Timestamp в Date
+        const parsedDate = new Date(date.toDate());
         const groupDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
 
         const key = `${groupDate.toISOString()}-${name}`;
@@ -76,15 +78,22 @@ async function loadData() {
         }
     });
 
-    // Фильтрация и сортировка данных
     const filteredData = Object.values(data).filter(item => {
         const itemDate = formatDate(item.groupDate);
         return (!filterName || item.name.toLowerCase().includes(filterName)) &&
                (!filterDate || itemDate === filterDate);
     });
 
-    // Сортировка и отображение данных
-    filteredData.sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises).forEach(item => {
+    totalRows = filteredData.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    currentPage = Math.min(currentPage, totalPages);
+
+    const startRow = (currentPage - 1) * rowsPerPage;
+    const endRow = startRow + rowsPerPage;
+
+    const pageData = filteredData.slice(startRow, endRow);
+
+    pageData.sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises).forEach(item => {
         tableRows += `<tr>
                         <td>${item.name}</td>
                         <td>${item.squats}</td>
@@ -96,8 +105,31 @@ async function loadData() {
 
     const table = document.getElementById('dailyStats').getElementsByTagName('tbody')[0];
     table.innerHTML = tableRows;
+
+    document.getElementById('pageNumber').textContent = currentPage;
+    updatePaginationButtons();
     await drawChart();
 }
+
+function updatePaginationButtons() {
+    document.getElementById('prevPage').disabled = currentPage <= 1;
+    document.getElementById('nextPage').disabled = currentPage * rowsPerPage >= totalRows;
+}
+
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        loadData();
+    }
+}
+
+function nextPage() {
+    if (currentPage * rowsPerPage < totalRows) {
+        currentPage++;
+        loadData();
+    }
+}
+
 async function drawChart() {
     const ctx = document.getElementById('leaderChart').getContext('2d');
     if (!ctx) {
@@ -133,8 +165,7 @@ async function drawChart() {
         borderWidth: 1
     }));
 
-    // Создание столбчатого графика
-    const chart = new Chart(ctx, {
+    new Chart(ctx, {
         type: 'bar',
         data: {
             labels: dates,
@@ -146,7 +177,6 @@ async function drawChart() {
                     beginAtZero: true
                 },
                 x: {
-                    // Эта опция гарантирует, что столбцы будут группироваться, а не наслаиваться
                     stacked: false
                 }
             },
@@ -161,4 +191,23 @@ function getRandomColor() {
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
     return `rgb(${r}, ${g}, ${b})`;
+}
+
+async function populateNameList() {
+    const nameList = document.getElementById('nameList');
+    nameList.innerHTML = ''; // Clear existing options
+
+    const querySnapshot = await getDocs(collection(db, "exercises"));
+    const names = new Set();
+
+    querySnapshot.forEach(doc => {
+        const { name } = doc.data();
+        names.add(name);
+    });
+
+    names.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        nameList.appendChild(option);
+    });
 }
