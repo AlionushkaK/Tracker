@@ -4,69 +4,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Challenge</title>
+    <title>Челлендж 1.0</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h1>Challenge</h1>
+    <h1>Челлендж 1.0</h1>
     <img src="Logo.png" alt="Knight Logo" class="exercise-logo">
-    <div class="form-container" style="display: flex; justify-content: space-between;">
+    <div style="display: flex; justify-content: space-between;">
         <form id="exerciseForm">
             <label for="name">Имя:</label>
-            <input type="text" id="name" placeholder="Введите имя или выберите из списка" list="nameList" required>
-            <datalist id="nameList">
-                     <!-- Эти опции будут добавляться динамически через JavaScript -->
-            </datalist>
+        <input type="text" id="name" placeholder="Введите имя или выберите из списка" list="nameList" required>
+        <datalist id="nameList">
+            <!-- Эти опции будут добавляться динамически через JavaScript -->/
+        </datalist>
+        <br><br>
+
+
+
+            <label for="squats">Приседания:</label>
+            <input type="number" id="squats" placeholder="Введите количество приседаний" required>
             <br><br>
 
-
-            <label for="squats">Squats:</label>
-            <input type="number" id="squats" placeholder="Enter the number of squats" required>
+            <label for="pushups">Отжимания:</label>
+            <input type="number" id="pushups" placeholder="Введите количество отжиманий" required>
             <br><br>
 
-            <label for="pushups">Push ups:</label>
-            <input type="number" id="pushups" placeholder="Enter the number of push-ups" required>
+            <label for="lunges">Выпады:</label>
+            <input type="number" id="lunges" placeholder="Введите количество выпадов" required>
             <br><br>
 
-            <label for="lunges">Lunges:</label>
-            <input type="number" id="lunges" placeholder="Enter the number of lunges" required>
-            <br><br>
-
-            <button type="submit" class="btn">Submit champion result</button>
+            <button type="submit">Отправить результаты чемпиона</button>
         </form>
-        <div class="chart-container" style="flex: 1;">
+        <div style="flex: 1;"> <!-- Контейнер для графика -->
             <canvas id="leaderChart" width="400" height="400"></canvas>
         </div>
     </div>
 
+
     <img src="Horse.png" alt="Run Wawa Run Logo" class="exercise-logo">
-    <div id="result"></div>
-    <div class="filter-container">
-        <label for="filterName">Filter by name:</label>
-        <input type="text" id="filterName" placeholder="Enter your name" oninput="loadData()">
+    <div id="result">
     </div>
     <h2>Статистика:</h2>
-
     <table id="dailyStats">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Squats</th>
-                <th>Pushups</th>
-                <th>Lunges</th>
-                <th>Date</th>
+                <th>Имя</th>
+                <th>Приседания</th>
+                <th>Отжимания</th>
+                <th>Выпады</th>
+                <th>Дата</th>
             </tr>
         </thead>
         <tbody>
         </tbody>
     </table>
-
     <script type="module">
+        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
         import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
 
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
             apiKey: "AIzaSyD7TpKxeTrn4gNtMbxm5CBYvm6ONihJrmQ",
             authDomain: "tracker-ac145.firebaseapp.com",
@@ -76,6 +78,8 @@
             appId: "1:493504976907:web:ba6b17adf84d40421fcf0e",
             measurementId: "G-YE9D0M156W"
         };
+
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         window.db = getFirestore(app);
@@ -87,6 +91,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.0"></script>
+
 
 </body>
 

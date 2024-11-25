@@ -1,14 +1,7 @@
-let currentPage = 1;
-let rowsPerPage = 15;
-let totalRows = 0;
-
-document.addEventListener('DOMContentLoaded', function () {
-    loadData();
 document.addEventListener('DOMContentLoaded', function () {
     loadData();
     populateNameDropdown(); // Заполняем выпадающий список имен
 });
-
 
 document.getElementById('exerciseForm').addEventListener('submit', async function (event) {
     event.preventDefault();
@@ -20,7 +13,7 @@ document.getElementById('exerciseForm').addEventListener('submit', async functio
 
     const name = nameInput.value.trim();
     if (name === '') {
-        alert('Please enter a name.');
+        alert('Пожалуйста, введите имя.');
         return;
     }
 
@@ -29,12 +22,13 @@ document.getElementById('exerciseForm').addEventListener('submit', async functio
     const lunges = parseInt(lungesInput.value, 10) || 0;
 
     try {
+        // Добавляем данные в коллекцию Firestore
         await addDoc(collection(window.db, "exercises"), {
             name: name,
             squats: squats,
             pushups: pushups,
             lunges: lunges,
-            date: new Date()
+            date: new Date() // Записываем текущую дату и время
         });
         console.log("Data added successfully.");
     } catch (error) {
@@ -46,8 +40,6 @@ document.getElementById('exerciseForm').addEventListener('submit', async functio
     pushupsInput.value = '';
     lungesInput.value = '';
     await loadData();
-await populateNameDropdown(); // Заполняем выпадающий список имен
-
 });
 
 function formatDate(date) {
@@ -58,14 +50,13 @@ function formatDate(date) {
 }
 
 async function loadData() {
-
     const querySnapshot = await getDocs(collection(db, "exercises"));
     let tableRows = "";
 
     const data = {};
     querySnapshot.forEach(doc => {
         const { name, squats, pushups, lunges, date } = doc.data();
-        const parsedDate = new Date(date.toDate());
+        const parsedDate = new Date(date.toDate()); // Преобразование Firestore Timestamp в Date
         const groupDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
 
         const key = `${groupDate.toISOString()}-${name}`;
@@ -79,16 +70,14 @@ async function loadData() {
         }
     });
 
-const sortedData = Object.values(data).sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises);
+    // Сортировка данных: сначала по дате (самые новые), затем по общему количеству упражнений
+    const sortedData = Object.values(data).sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises);
 
-// Ограничиваем результат до 30 строк для таблицы
-const limitedData = sortedData.slice(0, 30);
+    // Ограничиваем результат до 30 строк для таблицы
+    const limitedData = sortedData.slice(0, 30);
 
-// Генерация строк таблицы
-limitedData.forEach(item => {
-    // Ваш код для добавления строк в таблицу
-});
-
+    // Генерация строк таблицы
+    limitedData.forEach(item => {
         tableRows += `<tr>
                         <td>${item.name}</td>
                         <td>${item.squats}</td>
@@ -101,7 +90,6 @@ limitedData.forEach(item => {
     // Обновление содержимого таблицы
     const table = document.getElementById('dailyStats').getElementsByTagName('tbody')[0];
     table.innerHTML = tableRows;
-
 
     // Передача ограниченных данных для построения графика
     await drawChart(limitedData);
@@ -128,7 +116,6 @@ async function populateNameDropdown() {
 }
 
 async function drawChart(data) {
-
     const ctx = document.getElementById('leaderChart').getContext('2d');
     if (!ctx) {
         console.error('Canvas element not found!');
@@ -161,6 +148,7 @@ async function drawChart(data) {
         borderWidth: 1
     }));
 
+    // Создание столбчатого графика
     new Chart(ctx, {
         type: 'bar',
         data: {
@@ -191,7 +179,7 @@ function getRandomColor() {
 
 async function populateNameDropdown() {
     const querySnapshot = await getDocs(collection(db, "exercises"));
-    const names = new Set(); // Используем Set, чтобы избежать повторений
+    const names = new Set(); // Используем Set, чтобы избежать повторений /
 
     querySnapshot.forEach(doc => {
         const { name } = doc.data();
@@ -201,10 +189,10 @@ async function populateNameDropdown() {
     });
 
     const nameList = document.getElementById('nameList'); // Используем <datalist>
-
     names.forEach(name => {
         const option = document.createElement('option');
         option.value = name;
         nameList.appendChild(option);
     });
 }
+
