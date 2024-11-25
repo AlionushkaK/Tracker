@@ -21,7 +21,7 @@ body::before {
     background-position: right bottom;
     background-repeat: no-repeat;
     opacity: 0.3; /* Задаем прозрачность фоновому изображению */
-    z-index: -4100; /* Убедитесь, что фон находится за содержимым */   
+    z-index: -4100; /* Убедитесь, что фон находится за содержимым */
 }
 
 form {
@@ -29,7 +29,8 @@ form {
     margin-left: 0; /* Устанавливаем отступ слева, чтобы прижать форму к левому краю */
     padding: 10px; /* Добавляем паддинг внутри формы для лучшего вида элементов */
     box-sizing: border-box;
-    margin-top: 5px; /* Меньший отступ сверху для формы */}
+    margin-top: 5px; /* Меньший отступ сверху для формы */
+    }
 
 input[type="text"], input[type="number"], button {
     width: 100%; /* Поля и кнопка займут всю ширину формы */
@@ -82,6 +83,11 @@ th, td {
 #dailyStats tbody tr:first-child td:first-child {
     font-weight: bold; /* Делаем текст жирным */
 }
+/#filterName,
+/#filterDate {
+    display: none; /* Скрывает элементы фильтров */
+}
+
 
 @media (max-width: 768px) {
     table {

@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     loadData();
+    populateNameDropdown(); // Заполняем выпадающий список имен
 });
 
 document.getElementById('exerciseForm').addEventListener('submit', async function (event) {
@@ -19,20 +20,17 @@ document.getElementById('exerciseForm').addEventListener('submit', async functio
     const squats = parseInt(squatsInput.value, 10) || 0;
     const pushups = parseInt(pushupsInput.value, 10) || 0;
     const lunges = parseInt(lungesInput.value, 10) || 0;
-   
-
 
     try {
         // Добавляем данные в коллекцию Firestore
         await addDoc(collection(window.db, "exercises"), {
             name: name,
-            squats: parseInt(squats),
-            pushups: parseInt(pushups),
-            lunges: parseInt(lunges),
+            squats: squats,
+            pushups: pushups,
+            lunges: lunges,
             date: new Date() // Записываем текущую дату и время
         });
         console.log("Data added successfully.");
-        // Очистка формы или другие действия после отправки
     } catch (error) {
         console.error("Error adding document: ", error);
     }
@@ -41,21 +39,17 @@ document.getElementById('exerciseForm').addEventListener('submit', async functio
     squatsInput.value = '';
     pushupsInput.value = '';
     lungesInput.value = '';
-    await loadData()
+    await loadData();
 });
 
 function formatDate(date) {
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
-    return `${year}-${month}-${day}`; // Изменение порядка для соответствия формату HTML input[type="date"]
+    return `${year}-${month}-${day}`;
 }
 
-
 async function loadData() {
-    const filterName = document.getElementById('filterName').value.toLowerCase().trim();
-    const filterDate = document.getElementById('filterDate').value; // Формат yyyy-mm-dd
-
     const querySnapshot = await getDocs(collection(db, "exercises"));
     let tableRows = "";
 
@@ -72,19 +66,18 @@ async function loadData() {
             data[key].squats += squats;
             data[key].pushups += pushups;
             data[key].lunges += lunges;
-            data[key].totalExercises += (squats + pushups + lunges);
+            data[key].totalExercises += squats + pushups + lunges;
         }
     });
 
-    // Фильтрация и сортировка данных
-    const filteredData = Object.values(data).filter(item => {
-        const itemDate = formatDate(item.groupDate);
-        return (!filterName || item.name.toLowerCase().includes(filterName)) &&
-               (!filterDate || itemDate === filterDate);
-    });
+    // Сортировка данных: сначала по дате (самые новые), затем по общему количеству упражнений
+    const sortedData = Object.values(data).sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises);
 
-    // Сортировка и отображение данных
-    filteredData.sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises).forEach(item => {
+    // Ограничиваем результат до 30 строк для таблицы
+    const limitedData = sortedData.slice(0, 30);
+
+    // Генерация строк таблицы
+    limitedData.forEach(item => {
         tableRows += `<tr>
                         <td>${item.name}</td>
                         <td>${item.squats}</td>
@@ -94,29 +87,51 @@ async function loadData() {
                       </tr>`;
     });
 
+    // Обновление содержимого таблицы
     const table = document.getElementById('dailyStats').getElementsByTagName('tbody')[0];
     table.innerHTML = tableRows;
-    await drawChart();
+
+    // Передача ограниченных данных для построения графика
+    await drawChart(limitedData);
 }
-async function drawChart() {
+
+async function populateNameDropdown() {
+    const querySnapshot = await getDocs(collection(db, "exercises"));
+    const names = new Set(); // Используем Set, чтобы избежать повторений
+
+    querySnapshot.forEach(doc => {
+        const { name } = doc.data();
+        if (name) {
+            names.add(name);
+        }
+    });
+
+    const nameInput = document.getElementById('name');
+    names.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        nameInput.appendChild(option);
+    });
+}
+
+async function drawChart(data) {
     const ctx = document.getElementById('leaderChart').getContext('2d');
     if (!ctx) {
         console.error('Canvas element not found!');
         return;
     }
 
-    const querySnapshot = await getDocs(collection(db, "exercises"));
-    let dataByDate = {};
+    // Группировка данных для графика
+    const dataByDate = {};
 
-    querySnapshot.forEach(doc => {
-        const { name, squats, pushups, lunges, date } = doc.data();
-        const parsedDate = new Date(date.toDate());
-        const formattedDate = formatDate(parsedDate);
+    data.forEach(item => {
+        const formattedDate = formatDate(item.groupDate);
 
         if (!dataByDate[formattedDate]) {
             dataByDate[formattedDate] = {};
         }
-        dataByDate[formattedDate][name] = (dataByDate[formattedDate][name] || 0) + squats + pushups + lunges;
+        dataByDate[formattedDate][item.name] = (dataByDate[formattedDate][item.name] || 0) + item.totalExercises;
     });
 
     const dates = Object.keys(dataByDate).sort();
@@ -134,7 +149,7 @@ async function drawChart() {
     }));
 
     // Создание столбчатого графика
-    const chart = new Chart(ctx, {
+    new Chart(ctx, {
         type: 'bar',
         data: {
             labels: dates,
@@ -146,7 +161,6 @@ async function drawChart() {
                     beginAtZero: true
                 },
                 x: {
-                    // Эта опция гарантирует, что столбцы будут группироваться, а не наслаиваться
                     stacked: false
                 }
             },
@@ -161,4 +175,23 @@ function getRandomColor() {
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
     return `rgb(${r}, ${g}, ${b})`;
+}
+
+async function populateNameDropdown() {
+    const querySnapshot = await getDocs(collection(db, "exercises"));
+    const names = new Set(); // Используем Set, чтобы избежать повторений
+
+    querySnapshot.forEach(doc => {
+        const { name } = doc.data();
+        if (name) {
+            names.add(name.trim()); // Добавляем уникальные имена
+        }
+    });
+
+    const nameList = document.getElementById('nameList'); // Используем <datalist>
+    names.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        nameList.appendChild(option);
+    });
 }
