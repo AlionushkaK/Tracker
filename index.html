@@ -13,11 +13,13 @@
     <img src="Logo.png" alt="Knight Logo" class="exercise-logo">
     <div class="form-container" style="display: flex; justify-content: space-between;">
         <form id="exerciseForm">
-            <label for="name">Name:</label>
-            <input type="text" id="name" placeholder="Enter your name" required list="nameList">
+            <label for="name">Имя:</label>
+            <input type="text" id="name" placeholder="Введите имя или выберите из списка" list="nameList" required>
             <datalist id="nameList">
+                     <!-- Эти опции будут добавляться динамически через JavaScript -->
             </datalist>
             <br><br>
+
 
             <label for="squats">Squats:</label>
             <input type="number" id="squats" placeholder="Enter the number of squats" required>
@@ -44,26 +46,8 @@
         <label for="filterName">Filter by name:</label>
         <input type="text" id="filterName" placeholder="Enter your name" oninput="loadData()">
     </div>
-    <div class="filter-container">
-        <label for="filterDate">Filter by date:</label>
-        <input type="date" id="filterDate" onchange="loadData()">
-    </div>
+    <h2>Статистика:</h2>
 
-    <div class="pagination-container">
-        <label for="rowsPerPage">Rows per page:</label>
-        <select id="rowsPerPage" onchange="loadData()">
-            <option value="15">15</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-        </select>
-    </div>
-    <div class="pagination">
-        <span id="pageNumber">1</span>
-        <button id="prevPage" class="btn pagination-btn" onclick="prevPage()">Previous</button>
-        <button id="nextPage" class="btn pagination-btn" onclick="nextPage()">Next</button>
-    </div>
-
-    <h2>Statistics:</h2>
     <table id="dailyStats">
         <thead>
             <tr>

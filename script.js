@@ -4,8 +4,11 @@ let totalRows = 0;
 
 document.addEventListener('DOMContentLoaded', function () {
     loadData();
-    populateNameList();
+document.addEventListener('DOMContentLoaded', function () {
+    loadData();
+    populateNameDropdown(); // Заполняем выпадающий список имен
 });
+
 
 document.getElementById('exerciseForm').addEventListener('submit', async function (event) {
     event.preventDefault();
@@ -43,7 +46,8 @@ document.getElementById('exerciseForm').addEventListener('submit', async functio
     pushupsInput.value = '';
     lungesInput.value = '';
     await loadData();
-    await populateNameList();
+await populateNameDropdown(); // Заполняем выпадающий список имен
+
 });
 
 function formatDate(date) {
@@ -54,9 +58,6 @@ function formatDate(date) {
 }
 
 async function loadData() {
-    rowsPerPage = parseInt(document.getElementById('rowsPerPage').value);
-    const filterName = document.getElementById('filterName').value.toLowerCase().trim();
-    const filterDate = document.getElementById('filterDate').value;
 
     const querySnapshot = await getDocs(collection(db, "exercises"));
     let tableRows = "";
@@ -74,26 +75,20 @@ async function loadData() {
             data[key].squats += squats;
             data[key].pushups += pushups;
             data[key].lunges += lunges;
-            data[key].totalExercises += (squats + pushups + lunges);
+            data[key].totalExercises += squats + pushups + lunges;
         }
     });
 
-    const filteredData = Object.values(data).filter(item => {
-        const itemDate = formatDate(item.groupDate);
-        return (!filterName || item.name.toLowerCase().includes(filterName)) &&
-               (!filterDate || itemDate === filterDate);
-    });
+const sortedData = Object.values(data).sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises);
 
-    totalRows = filteredData.length;
-    const totalPages = Math.ceil(totalRows / rowsPerPage);
-    currentPage = Math.min(currentPage, totalPages);
+// Ограничиваем результат до 30 строк для таблицы
+const limitedData = sortedData.slice(0, 30);
 
-    const startRow = (currentPage - 1) * rowsPerPage;
-    const endRow = startRow + rowsPerPage;
+// Генерация строк таблицы
+limitedData.forEach(item => {
+    // Ваш код для добавления строк в таблицу
+});
 
-    const pageData = filteredData.slice(startRow, endRow);
-
-    pageData.sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises).forEach(item => {
         tableRows += `<tr>
                         <td>${item.name}</td>
                         <td>${item.squats}</td>
@@ -103,52 +98,53 @@ async function loadData() {
                       </tr>`;
     });
 
+    // Обновление содержимого таблицы
     const table = document.getElementById('dailyStats').getElementsByTagName('tbody')[0];
     table.innerHTML = tableRows;
 
-    document.getElementById('pageNumber').textContent = currentPage;
-    updatePaginationButtons();
-    await drawChart();
+
+    // Передача ограниченных данных для построения графика
+    await drawChart(limitedData);
 }
 
-function updatePaginationButtons() {
-    document.getElementById('prevPage').disabled = currentPage <= 1;
-    document.getElementById('nextPage').disabled = currentPage * rowsPerPage >= totalRows;
+async function populateNameDropdown() {
+    const querySnapshot = await getDocs(collection(db, "exercises"));
+    const names = new Set(); // Используем Set, чтобы избежать повторений
+
+    querySnapshot.forEach(doc => {
+        const { name } = doc.data();
+        if (name) {
+            names.add(name);
+        }
+    });
+
+    const nameInput = document.getElementById('name');
+    names.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        nameInput.appendChild(option);
+    });
 }
 
-function prevPage() {
-    if (currentPage > 1) {
-        currentPage--;
-        loadData();
-    }
-}
+async function drawChart(data) {
 
-function nextPage() {
-    if (currentPage * rowsPerPage < totalRows) {
-        currentPage++;
-        loadData();
-    }
-}
-
-async function drawChart() {
     const ctx = document.getElementById('leaderChart').getContext('2d');
     if (!ctx) {
         console.error('Canvas element not found!');
         return;
     }
 
-    const querySnapshot = await getDocs(collection(db, "exercises"));
-    let dataByDate = {};
+    // Группировка данных для графика
+    const dataByDate = {};
 
-    querySnapshot.forEach(doc => {
-        const { name, squats, pushups, lunges, date } = doc.data();
-        const parsedDate = new Date(date.toDate());
-        const formattedDate = formatDate(parsedDate);
+    data.forEach(item => {
+        const formattedDate = formatDate(item.groupDate);
 
         if (!dataByDate[formattedDate]) {
             dataByDate[formattedDate] = {};
         }
-        dataByDate[formattedDate][name] = (dataByDate[formattedDate][name] || 0) + squats + pushups + lunges;
+        dataByDate[formattedDate][item.name] = (dataByDate[formattedDate][item.name] || 0) + item.totalExercises;
     });
 
     const dates = Object.keys(dataByDate).sort();
@@ -193,17 +189,18 @@ function getRandomColor() {
     return `rgb(${r}, ${g}, ${b})`;
 }
 
-async function populateNameList() {
-    const nameList = document.getElementById('nameList');
-    nameList.innerHTML = ''; // Clear existing options
-
+async function populateNameDropdown() {
     const querySnapshot = await getDocs(collection(db, "exercises"));
-    const names = new Set();
+    const names = new Set(); // Используем Set, чтобы избежать повторений
 
     querySnapshot.forEach(doc => {
         const { name } = doc.data();
-        names.add(name);
+        if (name) {
+            names.add(name.trim()); // Добавляем уникальные имена
+        }
     });
+
+    const nameList = document.getElementById('nameList'); // Используем <datalist>
 
     names.forEach(name => {
         const option = document.createElement('option');
