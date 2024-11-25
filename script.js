@@ -52,9 +52,13 @@ function formatDate(date) {
 }
 
 
+
 async function loadData() {
     const filterName = document.getElementById('filterName').value.toLowerCase().trim();
     const filterDate = document.getElementById('filterDate').value; // Формат yyyy-mm-dd
+
+    const usersSnapshot = await getDocs(collection(db, "users")); // Допустим, что у вас есть коллекция с пользователями
+    const allUsers = usersSnapshot.docs.map(doc => doc.data().name);
 
     const querySnapshot = await getDocs(collection(db, "exercises"));
     let tableRows = "";
@@ -77,20 +81,34 @@ async function loadData() {
     });
 
     // Фильтрация и сортировка данных
-    const filteredData = Object.values(data).filter(item => {
+     const filteredData = Object.values(data).filter(item => {
         const itemDate = formatDate(item.groupDate);
         return (!filterName || item.name.toLowerCase().includes(filterName)) &&
                (!filterDate || itemDate === filterDate);
     });
+    // Сортировка данных (новые записи сверху)
+   filteredData.sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises);
+
+   // Проверка на отсутствующих пользователей
+    const presentUsers = new Set(filteredData.map(item => item.name));
+    const missingUsers = allUsers.filter(user => !presentUsers.has(user));
 
     // Сортировка и отображение данных
-    filteredData.sort((a, b) => b.groupDate - a.groupDate || b.totalExercises - a.totalExercises).forEach(item => {
+    filteredData.forEach(item => {
         tableRows += `<tr>
                         <td>${item.name}</td>
                         <td>${item.squats}</td>
                         <td>${item.pushups}</td>
                         <td>${item.lunges}</td>
                         <td>${formatDate(item.groupDate)}</td>
+                      </tr>`;
+    });
+
+ // Добавление отсутствующих пользователей
+    missingUsers.forEach(user => {
+        tableRows += `<tr style="background-color: red;">
+                        <td>${user}</td>
+                        <td colspan="4">Данные не внесены</td>
                       </tr>`;
     });
 
